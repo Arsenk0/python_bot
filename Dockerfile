@@ -1,13 +1,13 @@
-# Use an official Python runtime as a parent image
-FROM python:3.9-slim
+# Use a newer Python version if necessary
+FROM python:3.10-slim
 
-# Set environment variable for Python to not buffer outputs (useful for logging)
+# Set environment variable to avoid buffering (useful for logs)
 ENV PYTHONUNBUFFERED=1
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy requirements.txt into the container at /app
+# Copy only requirements.txt first to leverage Docker caching
 COPY requirements.txt /app/
 
 # Create a virtual environment and install dependencies
@@ -16,10 +16,10 @@ RUN python -m venv /opt/venv && \
     pip install --upgrade pip && \
     pip install -r requirements.txt
 
-# Ensure the virtual environment binaries are in the PATH
+# Add the virtual environment to the PATH
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Copy the rest of the application code into the container
+# Copy the rest of the application
 COPY . /app/
 
 # Command to run your bot
