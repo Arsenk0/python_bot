@@ -1,11 +1,26 @@
-# Set environment path to include virtual environment binaries
+# Use an official Python runtime as a parent image
+FROM python:3.9-slim
+
+# Set environment variable for Python to not buffer outputs (useful for logging)
+ENV PYTHONUNBUFFERED=1
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy requirements.txt into the container at /app
+COPY requirements.txt /app/
+
+# Create a virtual environment and install dependencies
+RUN python -m venv /opt/venv && \
+    . /opt/venv/bin/activate && \
+    pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+# Ensure the virtual environment binaries are in the PATH
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Copy the project files into the container
-COPY . /app/.
+# Copy the rest of the application code into the container
+COPY . /app/
 
-# Create a virtual environment, activate it, and install dependencies
-RUN --mount=type=cache,id=s/509af92e-b487-4b0e-b572-b636ff39029f-/root/cache/pip,target=/root/.cache/pip \
-    python -m venv --copies /opt/venv && \
-    . /opt/venv/bin/activate && \
-    pip install -r requirements.txt
+# Command to run your bot
+CMD ["python", "bot.py"]
